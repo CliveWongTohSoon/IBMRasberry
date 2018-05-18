@@ -1,7 +1,7 @@
 {
-  "name": "tjbot-raspberrypi-nodejs",
+  "name": "IBM Social Game - Raspberry",
   "version": "1.0.0",
-  "description": "TJBot has feelings.",
+  "description": "Link to IBM Spaceship.",
   "main": "run.js",
   "scripts": {
     "start": "node run.js",
@@ -9,9 +9,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:boxcarton/tjbot-raspberrypi-nodejs.git"
+    "url": "https://github.com/CliveWongTohSoon/IBMRasberry.git"
   },
-  "author": "Josh Zheng",
+  "author": "Clive Wong",
   "dependencies": {
     "mic": "^2.1.2",
     "node-ffprobe": "^1.2.2",
