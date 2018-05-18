@@ -1,5 +1,5 @@
 const watson = require('watson-developer-cloud'); //to connect to Watson developer cloud
-const config = require('../config.js') // to get our credentials and the attention word from the config.js files
+const config = require('../config.js'); // to get our credentials and the attention word from the config.js files
 const prompt = require('prompt');
 
 const conversation = watson.conversation({
@@ -27,6 +27,6 @@ let converse = () =>
     });
 
     converse();
-  })
+  });
 
 converse();

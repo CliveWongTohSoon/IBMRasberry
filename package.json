@@ -13,11 +13,12 @@
   },
   "author": "Josh Zheng",
   "dependencies": {
-    "mic": "^2.1.1",
+    "mic": "^2.1.2",
     "node-ffprobe": "^1.2.2",
     "play-sound": "^1.1.1",
     "prompt": "^1.0.0",
     "raspicam": "git+https://github.com/troyth/node-raspicam.git",
-    "watson-developer-cloud": "^2.2.0"
+    "update": "^0.7.4",
+    "watson-developer-cloud": "^3.4.1"
   }
 }
