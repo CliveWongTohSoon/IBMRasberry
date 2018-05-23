@@ -13,7 +13,9 @@
   },
   "author": "Clive Wong",
   "dependencies": {
+    "express": "^4.16.3",
     "mic": "^2.1.2",
+    "mongoose": "^5.1.1",
     "node-ffprobe": "^1.2.2",
     "play-sound": "^1.1.1",
     "prompt": "^1.0.0",

@@ -3,14 +3,24 @@ const WatsonToneAnalyzer = require('watson-developer-cloud/tone-analyzer/v3');
 const WatsonConversation = require('watson-developer-cloud/conversation/v1');
 const WatsonTextToSpeech = require('watson-developer-cloud/text-to-speech/v1');
 const config = require('./config.js');
+const attentionWord = config.attentionWord;
+
 const fs = require('fs');
 const mic = require('mic');
-// const player = require('play-sound')(opts = {});
 const exec = require('child_process').exec;
 const probe = require('node-ffprobe');
-const gameFn = require('./game');
 
-const attentionWord = config.attentionWord;
+const gameFn = require('./game');
+const mongoose = require('mongoose');
+
+const gpioFn = require('./gpio');
+
+/******************************************************************************
+ * Create MongoDB instance
+ ******************************************************************************/
+
+const uri = "mongodb://new-user:Ichi320g013o@ibmsocialgame-shard-00-00-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-01-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-02-zpkv9.mongodb.net:27017/test?ssl=true&replicaSet=IBMSocialGame-shard-0&authSource=admin&retryWrites=true";
+mongoose.connect(uri);
 
 /******************************************************************************
 * Create Watson Services
@@ -125,12 +135,16 @@ const speakResponse = (text) => {
   });
 };
 
+exports.speakResponse = speakResponse;
+
 /******************************************************************************
 * Conversation
 ******************************************************************************/
 let start_dialog = false;
 let context = {};
 let watson_response = '';
+
+// app.use('/instruction', instructionRoutes);
 
 speakResponse('Hi captain, on your command');
 textStream.on('data', (user_speech_text) => {
