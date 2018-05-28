@@ -20,6 +20,8 @@
     "play-sound": "^1.1.1",
     "prompt": "^1.0.0",
     "raspicam": "git+https://github.com/troyth/node-raspicam.git",
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1",
     "update": "^0.7.4",
     "watson-developer-cloud": "^3.4.1"
   }

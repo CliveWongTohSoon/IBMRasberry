@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
-    shipId: { type: Schema.Types.ObjectId },
+    shipId: { type: String },
     phase: {type: String, required: true},
     instruction0: { type: String, required: true },
     instruction1: { type: String, required: true },
