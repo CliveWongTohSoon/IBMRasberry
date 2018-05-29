@@ -27,7 +27,7 @@ const shipUid = 'TestShipA';
 /******************************************************************************
  * Set up Socket
  ******************************************************************************/
-const io = socketIO("https://ibmsg2018.eu-gb.mybluemix.net");
+const socket = socketIO("https://ibmsg2018.eu-gb.mybluemix.net");
 
 /******************************************************************************
  * Create MongoDB instance
@@ -181,82 +181,79 @@ let context = {};
 let watson_response = '';
 let intentArray = [];
 
-io.on("connect", socket => {
-  console.log("Socket connected!", socket);
+socket.on("connect", () => {
+  console.log("Socket connected!");
   
   // Initialise the gpio
-  io.on('start', shipData => {
+  socket.on('start', shipData => {
     console.log('Current ship data: ', shipData);
   });
 
   // Introduction
   speakResponse('Hi captain, on your command');
 
-  // Listen to report socket
-  io.on('report', reportData => {
-    console.log('Report:', reportData);
-  });
-
   // Listen to instruction socket
-  io.on('instruction', instructionData => {
+  socket.on('instruction', instructionData => {
     console.log('Instruction phase: ', instructionData);
-  });
 
+    if (instructionData.phase === 'action') { 
+      // Listen to instruction textstream
+      textStream.on('data', (user_speech_text) => { // TODO:- How to end the textstream?
+        // user_speech_text = user_speech_text.toLowerCase();
+        console.log('Watson hears: ', user_speech_text);
 
-  // Listen to textstream
-  textStream.on('data', (user_speech_text) => {
-    user_speech_text = user_speech_text.toLowerCase();
-    console.log('Watson hears: ', user_speech_text);
-    if (user_speech_text.indexOf(attentionWord.toLowerCase()) >= 0) {
-      start_dialog = true;
-    }
-    // Emit to instruction socket
+        getEmotion(user_speech_text).then((detectedEmotion) => {
+          context.emotion = detectedEmotion.emotion;
+          conversation.message({
+            workspace_id: config.ConWorkspace,
+            input: { 'text': user_speech_text },
+            context: context
+          }, (err, response) => {
+            context = response.context;
+            const intent = response.intents[0].intent;
+            const entity = response.entities[0] && response.entities[0].entity;
+            // console.log('intent:', response);
+            if (intent !== 'hello') intentArray.push(getInstruction(intent, entity));
 
-    if (start_dialog) {
-      getEmotion(user_speech_text).then((detectedEmotion) => {
-        context.emotion = detectedEmotion.emotion;
-        conversation.message({
-          workspace_id: config.ConWorkspace,
-          input: { 'text': user_speech_text },
-          context: context
-        }, (err, response) => {
-          context = response.context;
-          
-          const intent = response.intents[0].intent;
-          const entity = response.entities[0].entity;
-          // console.log('intent:', response);
-          if (intent !== 'hello') intentArray.push(getInstruction(intent, entity));
+            watson_response = response.output.text[0];
+            if (intentArray.length < 3) {
+              speakResponse(watson_response);
+              // console.log('Watson says: ', watson_response);  
+              console.log('Intent length: ', intentArray);
+              // speakResponse('What\'s next, captain?');
+            } else if (intentArray.length === 3) {
 
-          watson_response = response.output.text[0];
-          if (intentArray.length < 3) {
-            speakResponse(watson_response);
-            // console.log('Watson says: ', watson_response);  
-            console.log('Intent length: ', intentArray);
-            // speakResponse('What\'s next, captain?');
-          } else if (intentArray.length === 3) {
+              Instruction.findOne({ shipId: shipUid }, (err, instruction) => {
+                if (err) throw err;
+                instruction.instruction0 = intentArray[0];
+                instruction.instruction1 = intentArray[1];
+                instruction.instruction2 = intentArray[2];
+                // instruction.phase = 'action';
 
-            Instruction.findOne({shipId: shipUid}, (err, instruction) => {
-              if (err) throw err;
-              instruction.instruction0 = intentArray[0];
-              instruction.instruction1 = intentArray[1];
-              instruction.instruction2 = intentArray[2];
-              instruction.phase = 'action';
-              // Save to database
-              instruction.save(err, _ => {
-                if (!err) {
-                  // Emit to socket 
-                  console.log('Emit to socket!');
-                }
+                // Save to database
+                instruction.save(err, _ => {
+                  if (!err) {
+                    // Emit to socket
+                    console.log("Emit to socket instruction_client!");
+                    socket.emit('instruction_client', {shipId: shipUid}); 
+                  }
+                });
+
+                console.log('Calling instruction!', intentArray);
+                intentArray = [];
               });
-              console.log('Calling instruction!', intentArray);
-              intentArray = [];
-            });
-          }
+            }
+          });
         });
       });
-    } else {
-      speakResponse('You can call me ' + attentionWord + ', captain!');
-      // console.log('Waiting to hear the word "', attentionWord, '"');
+    } else { // if instruction given is in report phase
+      console.log('Report phase: ', instructionData);
+
+      // Report the ship status
+      console.log('Ship Status: ', instructionData.shipData);
+
+      // After finished reporting, emit to instruction socket, set the phase to action
+      socket.emit('instruction', {phase: 'action'});
     }
   });
 });
