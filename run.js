@@ -252,6 +252,10 @@ socket.on("connect", () => {
       // Report the ship status
       console.log('Ship Status: ', instructionData.shipData);
 
+      // Report the ship status after each instruction, 1 report to each instruction
+
+      // At the end of instruction, update the ship LED and Speakers
+
       // After finished reporting, emit to instruction socket, set the phase to action
       socket.emit('instruction', {phase: 'action'});
     }
