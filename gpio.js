@@ -210,6 +210,7 @@ function updateSpeakers(distance,angle){ // distance and angle are two arrays of
             select_lateral_2.writeSync(0);
             soundSpeakers(distance[i], "back", "left");
         }
+        pause(1000);
     }
 }
 
