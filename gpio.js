@@ -91,147 +91,124 @@ exports.turnMotor = turnMotor;
 
 //turnMotor("right");
 
-function updateSpeakers(ship){ // ship is an array of ships within radar distance and includes (relevent .distance .x .y)
+function updateSpeakers(distance,angle){ // distance and angle are two arrays of ships within radar distance and includes (relevent polar coordinate)
     for(i = 0; i < ship.length; i++){
-        if(ship[i].y == 0){
-            if(ship[i].x > 0){
-                select_lateral_0.writeSync(0);
-                select_lateral_1.writeSync(0);
-                select_lateral_2.writeSync(1);
-                soundSpeakers(ship[i].distance, "right", "");
-
-            } else {
-                select_lateral_0.writeSync(0);
-                select_lateral_1.writeSync(0);
-                select_lateral_2.writeSync(0);
-                soundSpeakers(ship[i].distance, "left", "");
-
-            }
-        } else if(ship[i].x == 0){
-            if(ship[i].y > 0){
-                select_longitudinal_0.writeSync(0);
-                select_longitudinal_1.writeSync(0);
-                select_longitudinal_2.writeSync(0);
-                soundSpeakers(ship[i].distance, "front", "");
-
-            } else {
-                select_longitudinal_0.writeSync(0);
-                select_longitudinal_1.writeSync(0);
-                select_longitudinal_2.writeSync(1);
-                soundSpeakers(ship[i].distance, "back", "");
-            }
-
-        } else if(ship[i].y >= 0){
-            if(ship[i].x >= 0){
-                if(abs(ship[i].y/ship[i].x)){ // 75% front 25% right
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(0);
-                    select_longitudinal_2.writeSync(0);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(1);
-                    soundSpeakers(ship[i].distance, "front", "right");
-                } else if(abs(ship[i].y/ship[i].x)){ // 50% front 50% right
-                    select_longitudinal_0.writeSync(0);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(0);
-                    select_lateral_0.writeSync(0);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(1);
-                    soundSpeakers(ship[i].distance, "front", "right");
-                } else { // 25% front 75% right
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(0);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(0);
-                    select_lateral_2.writeSync(1);
-                    soundSpeakers(ship[i].distance, "front", "right");
-                }
-            }
-            if(ship[i].x < 0){
-                if(abs(ship[i].y/ship[i].x) > 1.4){ // 75% front 25% left
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(0);
-                    select_longitudinal_2.writeSync(0);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(0);
-                    soundSpeakers(ship[i].distance, "front", "left");
-                } else if(abs(ship[i].y/ship[i].x) > 0.7){ // 50% front 50% left
-                    select_longitudinal_0.writeSync(0);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(0);
-                    select_lateral_0.writeSync(0);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(0);
-                    soundSpeakers(ship[i].distance, "front", "left");
-                } else { // 25% front 75% left
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(0);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(0);
-                    select_lateral_2.writeSync(0);
-                    soundSpeakers(ship[i].distance, "front", "left");
-                }
-            }
-
-        } else { 
-            if(ship[i].x > 0){
-                if(abs(ship[i].y/ship[i].x) > 1.4){ // 75% back 25% right
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(0);
-                    select_longitudinal_2.writeSync(1);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(1);
-                    soundSpeakers(ship[i].distance, "front", "right");
-                } else if(abs(ship[i].y/ship[i].x) > 0.7){ // 50% back 50% right
-                    select_longitudinal_0.writeSync(0);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(1);
-                    select_lateral_0.writeSync(0);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(1);
-                    soundSpeakers(ship[i].distance, "front", "right");
-                } else { // 25% back 75% right
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(1);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(0);
-                    select_lateral_2.writeSync(1);
-                    soundSpeakers(ship[i].distance, "front", "right");
-                }
-            }
-            if(ship[i].x < 0){
-                if(abs(ship[i].y/ship[i].x) > 1.4){ // 75% back 25% left
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(0);
-                    select_longitudinal_2.writeSync(1);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(0);
-                    soundSpeakers(ship[i].distance, "front", "left");
-                } else if(abs(ship[i].y/ship[i].x) > 0.7){ // 50% back 50% left
-                    select_longitudinal_0.writeSync(0);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(1);
-                    select_lateral_0.writeSync(0);
-                    select_lateral_1.writeSync(1);
-                    select_lateral_2.writeSync(0);
-                    soundSpeakers(ship[i].distance, "front", "left");
-                } else { // 25% back 75% left
-                    select_longitudinal_0.writeSync(1);
-                    select_longitudinal_1.writeSync(1);
-                    select_longitudinal_2.writeSync(1);
-                    select_lateral_0.writeSync(1);
-                    select_lateral_1.writeSync(0);
-                    select_lateral_2.writeSync(0);
-                    soundSpeakers(ship[i].distance, "front", "left");
-                }
-            }
+        if(angle[i] = 90){
+            select_lateral_0.writeSync(0);
+            select_lateral_1.writeSync(0);
+            select_lateral_2.writeSync(1);
+            soundSpeakers(distance[i], "right", "");
+        } else if(angle[i] = 270){
+            select_lateral_0.writeSync(0);
+            select_lateral_1.writeSync(0);
+            select_lateral_2.writeSync(0);
+            soundSpeakers(distance[i], "left", "");
+        } else if(angle[i] = 0){
+            select_longitudinal_0.writeSync(0);
+            select_longitudinal_1.writeSync(0);
+            select_longitudinal_2.writeSync(0);
+            soundSpeakers(distance[i], "front", "");
+        } else if (angle[i] = 180){
+            select_longitudinal_0.writeSync(0);
+            select_longitudinal_1.writeSync(0);
+            select_longitudinal_2.writeSync(1);
+            soundSpeakers(distance[i], "back", "");
+        } else if(angle[i]>0 && angle[i]<45){ // 75% front 25% right
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(0);
+            select_longitudinal_2.writeSync(0);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(1);
+            soundSpeakers(distance[i], "front", "right");
+        } else if( angle[i]==45 ){ // 50% front 50% right
+            select_longitudinal_0.writeSync(0);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(0);
+            select_lateral_0.writeSync(0);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(1);
+            soundSpeakers(distance[i], "front", "right");
+        }  else if( angle[i]>45 && angle[i]<90 ){ // 25% front 75% right
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(0);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(0);
+            select_lateral_2.writeSync(1);
+            soundSpeakers(distance[i], "front", "right");
+        } else if (angle[i] > 315 && angle[i] < 360 ){ // 75% front 25% left
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(0);
+            select_longitudinal_2.writeSync(0);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(0);
+            soundSpeakers(distance[i], "front", "left");
+        } else if(angle[i] == 315  ){ // 50% front 50% left
+            select_longitudinal_0.writeSync(0);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(0);
+            select_lateral_0.writeSync(0);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(0);
+            soundSpeakers(distance[i], "front", "left");
+        } else if( angle[i] > 315 && angle[i] < 360){  // 25% front 75% left
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(0);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(0);
+            select_lateral_2.writeSync(0);
+            soundSpeakers(distance[i], "front", "left");
+        } else if (angle[i] > 135 && angle[i] < 180 ){ // 75% back 25% right
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(0);
+            select_longitudinal_2.writeSync(1);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(1);
+            soundSpeakers(distance[i], "back", "right");
+        }else if (angle[i] == 135  ){ // 50% back 50% right
+            select_longitudinal_0.writeSync(0);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(1);
+            select_lateral_0.writeSync(0);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(1);
+            soundSpeakers(distance[i], "back", "right");
+        } else if (angle[i] > 135 && angle[i] < 180 ){ // 25% back 75% right
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(1);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(0);
+            select_lateral_2.writeSync(1);
+            soundSpeakers(distance[i], "back", "right");
+        } else if (angle[i] > 180 && angle[i] < 225 ){ // 75% back 25% left
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(0);
+            select_longitudinal_2.writeSync(1);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(0);
+            soundSpeakers(distance[i], "back", "left");
+        } else if (angle[i] == 180  ){// 50% back 50% left
+            select_longitudinal_0.writeSync(0);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(1);
+            select_lateral_0.writeSync(0);
+            select_lateral_1.writeSync(1);
+            select_lateral_2.writeSync(0);
+            soundSpeakers(distance[i], "back", "left");
+        } else if (angle[i] > 225 && angle[i] < 270 ){ // 25% back 75% left
+            select_longitudinal_0.writeSync(1);
+            select_longitudinal_1.writeSync(1);
+            select_longitudinal_2.writeSync(1);
+            select_lateral_0.writeSync(1);
+            select_lateral_1.writeSync(0);
+            select_lateral_2.writeSync(0);
+            soundSpeakers(distance[i], "back", "left");
         }
     }
 }
