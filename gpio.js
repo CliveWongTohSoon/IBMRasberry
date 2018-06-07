@@ -91,24 +91,24 @@ exports.turnMotor = turnMotor;
 
 //turnMotor("right");
 
-function updateSpeakers(distance,angle){ // distance and angle are two arrays of ships within radar distance and includes (relevent polar coordinate)
+function updateSpeakers(distance, angle){ // distance and angle are two arrays of ships within radar distance and includes (relevent polar coordinate)
     for(i = 0; i < ship.length; i++){
-        if(angle[i] = 90){
+        if(angle[i] === 90){
             select_lateral_0.writeSync(0);
             select_lateral_1.writeSync(0);
             select_lateral_2.writeSync(1);
             soundSpeakers(distance[i], "right", "");
-        } else if(angle[i] = 270){
+        } else if(angle[i] === 270){
             select_lateral_0.writeSync(0);
             select_lateral_1.writeSync(0);
             select_lateral_2.writeSync(0);
             soundSpeakers(distance[i], "left", "");
-        } else if(angle[i] = 0){
+        } else if(angle[i] === 0){
             select_longitudinal_0.writeSync(0);
             select_longitudinal_1.writeSync(0);
             select_longitudinal_2.writeSync(0);
             soundSpeakers(distance[i], "front", "");
-        } else if (angle[i] = 180){
+        } else if (angle[i] === 180){
             select_longitudinal_0.writeSync(0);
             select_longitudinal_1.writeSync(0);
             select_longitudinal_2.writeSync(1);
@@ -145,7 +145,7 @@ function updateSpeakers(distance,angle){ // distance and angle are two arrays of
             select_lateral_1.writeSync(1);
             select_lateral_2.writeSync(0);
             soundSpeakers(distance[i], "front", "left");
-        } else if(angle[i] == 315  ){ // 50% front 50% left
+        } else if(angle[i] === 315  ) { // 50% front 50% left
             select_longitudinal_0.writeSync(0);
             select_longitudinal_1.writeSync(1);
             select_longitudinal_2.writeSync(0);
