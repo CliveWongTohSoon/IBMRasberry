@@ -13,6 +13,7 @@ var select_longitudinal_2 = new gpio(14, 'out');
 var select_lateral_0 = new gpio(15, 'out');
 var select_lateral_1 = new gpio(16, 'out');
 var select_lateral_2 = new gpio(17, 'out');
+// Front speaker not working
 
 var Gpio = require('pigpio').Gpio;
 var speaker_longitudinal = new Gpio(18, {mode: Gpio.OUTPUT});
@@ -23,9 +24,9 @@ var motor_sleep = new gpio(22, 'out');
 var dutyCycle = 0;
 
 function test(){
-    speaker_longitudinal.pwmFrequency(1000);
+    // speaker_longitudinal.pwmFrequency(1000);
     speaker_lateral.pwmFrequency(1000);
-    speaker_longitudinal.pwmWrite(128);
+    // speaker_longitudinal.pwmWrite(128);
     speaker_lateral.pwmWrite(128);
     pause(150);
     speaker_longitudinal.pwmWrite(0);
@@ -36,6 +37,8 @@ function test(){
     //     speaker_lateral.pwmWrite(0);
     // }, 150);
 }
+
+exports.test = test;
 
 function test_motor(){
     motor_sleep.writeSync(1);
@@ -55,35 +58,39 @@ function pause(milliseconds) {
 	while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
 }
 
+exports.pause = pause;
 // for(j = 0; j<5;j++){
 //     console.log("beep")
 //     test();
 // }
 
-function turnMotor(direction){
+function turnMotor(direction) {
+    console.log('Entered turn motor');
     if(direction == "right"){
         motor_sleep.writeSync(1);
-        motor_direction.writeSync(1); // direction right
-        for(i = 0; i<100;i++){ // Take 100 steps (90 degrees)
+        motor_direction.writeSync(0); // direction right
+        for(i = 0; i<100; i++) { // Take 100 steps (90 degrees)
             motor_step.writeSync(1);
             pause(5);
             motor_step.writeSync(0);  
             pause(5);
         }
+        pause(1500);
         motor_sleep.writeSync(0);
-        console.log("trun right");
+        console.log("turn right");
     }
     if(direction == "left"){
         motor_sleep.writeSync(1);
-        motor_direction.writeSync(0); // direction left
+        motor_direction.writeSync(1); // direction left
         for(i = 0; i<100;i++){ // Take 100 steps (90 degrees)
             motor_step.writeSync(1);
             pause(5);
             motor_step.writeSync(0);  
             pause(5);
         }
+        pause(1500);
         motor_sleep.writeSync(0);
-        console.log("trun left");
+        console.log("turn left");
     }
 }
 
@@ -91,9 +98,36 @@ exports.turnMotor = turnMotor;
 
 //turnMotor("right");
 
+function testSpeaker() {
+  console.log("Entered testSpeaker");
+  select_lateral_0.writeSync(0); // This is L/R selector
+  select_lateral_1.writeSync(0);
+  select_lateral_2.writeSync(0);
+
+  select_longitudinal_0.writeSync(0); // F/B selector
+  select_longitudinal_1.writeSync(0);
+  select_longitudinal_2.writeSync(0);
+
+  // soundSpeakers(distance[0], "right", "");
+  frequency = 4000;
+  speaker_longitudinal.pwmFrequency(frequency);
+  speaker_lateral.pwmFrequency(frequency);
+//   speaker_lateral.pwmWrite(128);
+  speaker_longitudinal.pwmWrite(128);
+  // setTimeout(() => { // wait
+  //     speaker_lateral.pwmWrite(0);
+  // }, 250);
+  pause(250);
+//   speaker_lateral.pwmWrite(0);
+  speaker_longitudinal.pwmWrite(0);
+}
+
+exports.testSpeaker = testSpeaker;
+
 function updateSpeakers(distance, angle){ // distance and angle are two arrays of ships within radar distance and includes (relevent polar coordinate)
-    for(i = 0; i < ship.length; i++){
-        if(angle[i] === 90){
+    console.log('Entered update speakers');
+    for(i = 0; i < distance.length; i++) {
+        if(angle[i] === 90) {
             select_lateral_0.writeSync(0);
             select_lateral_1.writeSync(0);
             select_lateral_2.writeSync(1);
@@ -238,67 +272,55 @@ function soundSpeakers(distance, speaker0, speaker1){
     speaker_longitudinal.pwmFrequency(frequency);
     speaker_lateral.pwmFrequency(frequency);
 
-    if(speaker1 = ""){
+    if(speaker1 == ""){
         if(speaker0 = "front"){
             speaker_longitudinal.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_longitudinal.pwmWrite(0);
-            }, 250);
-            
+            pause(250);
+            speaker_longitudinal.pwmWrite(0);
         }
-        if(speaker0 = "back"){
+        if(speaker0 == "back"){
             speaker_longitudinal.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_longitudinal.pwmWrite(0);
-            }, 250);
-            
+            pause(250);
+            speaker_longitudinal.pwmWrite(0);
         }
-        if(speaker0 = "left"){
+        if(speaker0 == "left"){
             speaker_lateral.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_lateral.pwmWrite(0);
-            }, 250);
-            
+            pause(250);
+            speaker_lateral.pwmWrite(0);
         }
-        if(speaker0 = "right"){
+        if(speaker0 == "right"){
             speaker_lateral.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_lateral.pwmWrite(0);
-            }, 250);
-            
+            pause(250);
+            speaker_lateral.pwmWrite(0);            
         }
     } else{
         if(speaker0 == "front" && speaker1 == "right"){
             speaker_longitudinal.pwmWrite(128);
             speaker_lateral.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_longitudinal.pwmWrite(0);
-                speaker_lateral.pwmWrite(0);
-            }, 250);
+            pause(250);
+            speaker_longitudinal.pwmWrite(0);
+            speaker_lateral.pwmWrite(0);
         }
         if(speaker0 == "front" && speaker1 == "left"){
             speaker_longitudinal.pwmWrite(128);
             speaker_lateral.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_longitudinal.pwmWrite(0);
-                speaker_lateral.pwmWrite(0);
-            }, 250);
+            pause(250);
+            speaker_longitudinal.pwmWrite(0);
+            speaker_lateral.pwmWrite(0);
         }
         if(speaker0 == "back" && speaker1 == "right"){
             speaker_longitudinal.pwmWrite(128);
             speaker_lateral.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_longitudinal.pwmWrite(0);
-                speaker_lateral.pwmWrite(0);
-            }, 250);
+            pause(250);
+            speaker_longitudinal.pwmWrite(0);
+            speaker_lateral.pwmWrite(0);
         }
         if(speaker0 == "back" && speaker1 == "left"){
             speaker_longitudinal.pwmWrite(128);
             speaker_lateral.pwmWrite(128);
-            setTimeout(() => { // wait
-                speaker_longitudinal.pwmWrite(0);
-                speaker_lateral.pwmWrite(0);
-            }, 250);
+            pause(250);
+            speaker_longitudinal.pwmWrite(0);
+            speaker_lateral.pwmWrite(0);
         }
     }
 }

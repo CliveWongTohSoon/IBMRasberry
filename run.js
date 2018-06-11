@@ -24,15 +24,14 @@ const Start = require('./models/start');
  * Report
  ******************************************************************************/
 const report = [
-  "Nothing happened",             // code 0 
-  "Ship turning left",            // code 1
-  "Ship turning right",           // code 2
-  "Attacked successfully",        // code 3
-  "Attack missed",                // code 4
-  "We've been attacked",          // code 5
-  "Shield has been activated",    // code 6
-  "Shield has been hit",          // code 7
-  "We collided with another ship" // code 8
+    "Unknown entities detected within radar range",   // code 0
+    "Attacked the enemy successfully",                   // code 1
+    "Our weapons have missed",                           // code 2
+    "Our weapons have hit enemy shields",                // code 3
+    "We're under attack from an enemy",                  // code 4
+    "Shields have been damaged by an enemy",             // code 5
+    "We have collided with an enemy ship",               // code 6
+    "We've collided with an asteroid"                    // code 7
 ];
 
 /******************************************************************************
@@ -97,10 +96,10 @@ const micInputStream = micInstance.getAudioStream();
 let pauseDuration = 0;
 micInputStream.on('pauseComplete', ()=> {
   // console.log('Microphone paused for', pauseDuration, 'seconds.');
-  setTimeout(() => {
-      micInstance.resume();
-      console.log('Microphone resumed.')
-  }, Math.round(pauseDuration * 1000)); //Stop listening when speaker is talking
+  // setTimeout(function() {
+    micInstance.resume();
+    console.log('Microphone resumed.');
+  // }, Math.round(pauseDuration * 1000)); //Stop listening when speaker is talking
 });
 
 micInstance.start();
@@ -119,7 +118,7 @@ const sttParams = {
   timestamps: true,
   inactivity_timeout: -1,
   word_confidence: true,
-  speaker_labels: true,
+  speaker_labels: false,
   keywords_threshold: 0.5
   // model: "en-US_NarrowbandModel",
   // content_type: "audio/l16; rate=44100; channels=2",
@@ -180,6 +179,7 @@ const speakResponse = (text) => {
           console.log('exec error: ' + error);
         }
       });
+      gpioFn.pause(pauseDuration * 1000);
       // player.play('output.wav');
     });
   });
@@ -222,6 +222,33 @@ socket.on("connect", () => {
   // Initialise the gpio
   socket.on('start', shipData => {
     // console.log('Current ship data: ', shipData);
+    const myShip = shipData.filter(ship => ship.shipId === shipUid)[0];
+    const opponentDistance = myShip.opponentDistance;
+    const opponentAngle = myShip.opponentAngle;
+    console.log(myShip.shipId, opponentDistance, opponentAngle);
+    
+    // Update health point
+    gpioFn.updateLED(50, 60, 70, 80);
+
+    // Update speaker
+    gpioFn.updateSpeakers(opponentDistance, opponentAngle);
+
+    // Update direction
+    
+
+    // while(true) {
+    // gpioFn.turnMotor("left"); 
+      // gpioFn.pause(2000);
+    // }
+    // while(true) {
+    //   gpioFn.testSpeaker([1], [90]);
+    //   gpioFn.pause(1000);
+    // }
+
+    // while(true){
+    //   gpioFn.testSpeaker();
+    //   gpioFn.pause(1000);
+    // }
   });
 
   // Introduction
@@ -251,6 +278,13 @@ socket.on("connect", () => {
             const instructionToPush = getInstruction(intent, entity);
             if (intent !== 'hello' && instructionToPush !== 'tryagain') intentArray.push(instructionToPush);
 
+            // Turn motor
+            if (instructionToPush == 'LeftTurn') {
+              gpioFn.turnMotor('left');
+            } else if (instructionToPush == 'RightTurn') {
+              gpioFn.turnMotor('right');
+            }
+
             watson_response = response.output.text[0];
             if (intentArray.length < 3) {
               speakResponse(watson_response);
@@ -270,8 +304,8 @@ socket.on("connect", () => {
                 instruction.save(err, _ => {
                   if (!err) {
                     // Emit to socket
-                    console.log("Emit to socket instruction_client!");
-                    socket.emit('instruction_client', {shipId: shipUid}); 
+                    console.log("Emit to socket instruction_server!");
+                    socket.emit('instruction_server', {shipId: shipUid}); 
                     textStream.emit('close');
                   }
                 });
@@ -290,17 +324,17 @@ socket.on("connect", () => {
       console.log('Report phase: ', instructionData);
 
       micInstance.pause();
-      setTimeout(() => { }, 15000);
+      // setTimeout(() => { }, 15000);
 
       // Report the ship status after each instruction, 1 report to each instruction
-      const reportId0 = instructionData.report0;
-      const reportId1 = instructionData.report1;
-      const reportId2 = instructionData.report2;
+      const reportSpeech = instructionData.report.reduce((prev, cur) => {
+        prev += report[cur] + ". ";
+        return prev;
+      }, '');
 
-      // At the end of instruction, update the ship LED and Speakers
-
+      console.log('Report Speech:', reportSpeech);
       // Speak response
-      speakResponse(report[reportId0] + '. ' + report[reportId1] + '. ' + report[reportId1]);
+      speakResponse(reportSpeech);
 
       // After finished reporting, emit to instruction socket, set the phase to action
       socket.emit('instruction', {phase: 'action'});
