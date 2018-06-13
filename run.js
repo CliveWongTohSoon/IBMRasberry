@@ -35,8 +35,6 @@ const report = [
   "Our right weapons have missed"                                              // code 8
 ];
 
-// 2
-
 /******************************************************************************
  * Initialise Ship Id
  ******************************************************************************/
@@ -54,7 +52,7 @@ const socket = socketIO("https://ibmsg2018.eu-gb.mybluemix.net");
 const uri =
   "mongodb://new-user:IBMSG2018@ibmsocialgame-shard-00-00-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-01-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-02-zpkv9.mongodb.net:27017/test?ssl=true&replicaSet=IBMSocialGame-shard-0&authSource=admin&retryWrites=true";
 mongoose.connect(uri);
-// Instruction.find({}, console.log);
+
 /******************************************************************************
  * Create Watson Services
  *******************************************************************************/
@@ -99,14 +97,22 @@ const micInputStream = micInstance.getAudioStream();
 
 let pauseDuration = 0;
 
-micInputStream.on("pauseComplete", event => {
-  console.log("Microphone paused for", pauseDuration, "seconds.");
+micInputStream.on("pauseComplete", () => {
+  console.log("Microphone paused for ", pauseDuration, "seconds.");
   setTimeout(function() {
     // gpioFn.pause(pauseDuration * 1000);
     micInstance.resume();
     textStream.resume();
-    // textStream.emit('data');
+    // textStream.emit('data', 'Waiting...');
   }, Math.round(pauseDuration * 1000)); //Stop listening when speaker is talking
+});
+
+micInputStream.on("stopComplete", () => {
+  console.log("Stopped the mic for ", pauseDuration, " seconds.");
+  setTimeout(() => {
+    micInstance.start();
+    micInputStream.pipe(textStream);
+  }, Math.round(pauseDuration * 1000));
 });
 
 micInputStream.on("resumeComplete", () => {
@@ -146,19 +152,6 @@ const sttParams = {
   word_confidence: false,
   speaker_labels: false,
   keywords_threshold: 0.5
-  // word_alternatives_threshold: 0.7
-  // model: "en-US_NarrowbandModel",
-  // content_type: "audio/l16; rate=44100; channels=2",
-  // interim_results: true,
-  // smart_formatting: true,
-  // keywords: [attentionWord, "move", "fire", "shield", "left", "right", "forward", "front", "back"],
-  // keywords_threshold: 0.5,
-  // inactivity_timeout: -1,
-  // timestamps: true,
-  // max_alternatives: 5,
-  // word_alternatives_threshold: 0.7,
-  // word_confidence: true,
-  // speaker_labels: true
 };
 
 const textStream = speechToText.createRecognizeStream(sttParams);
@@ -202,20 +195,20 @@ const speakResponse = text => {
     .pipe(fs.createWriteStream("output.wav"))
     .once("close", () => {
       probe("output.wav", function(err, probeData) {
-        pauseDuration = probeData.format.duration + 0.2;
+        pauseDuration = probeData ? probeData.format.duration + 0.2 : 5;
+
         micInstance.pause();
         textStream.uncork();
         textStream.unpipe();
 
-        // Pause the textStream so it won't overwrites the current speech
-        textStream.pause();
+        // // Pause the textStream so it won't overwrites the current speech
+        // textStream.pause();
 
         exec("paplay output.wav", (error, stdout, stderr) => {
           if (error !== null) {
             console.log("exec error: " + error);
           }
         });
-        // textStream.emit('close');
         // player.play('output.wav');
       });
     });
@@ -266,7 +259,7 @@ const emitToSocket = () => {
           // Emit to socket
           console.log("Emit to socket instruction_server!");
           socket.emit("instruction_server", { shipId: shipUid });
-          textStream.pause();
+          // textStream.emit('close');
         }
       });
 
@@ -367,10 +360,7 @@ socket.on("connect", () => {
           console.log("Watson hears: ", user_speech_text);
           
           console.log("Time left:", 60 - timer);
-          
-          textStream.uncork();
-          textStream.unpipe();
-
+        
           if (user_speech_text !== 'Waiting...') { // If it's not waiting, send to watson assistant
             conversation.message(
               {
@@ -403,6 +393,13 @@ socket.on("connect", () => {
                   if (intent === 'attack') playSound('shoot.wav');
                   else if (intent === 'defence') playSound('shield.wav');
                   else if (intent === "goforward") playSound("move.wav");
+
+                  // Turn motor
+                  if (instructionToPush == 'LeftTurn') {
+                    gpioFn.turnMotor('left');
+                  } else if (instructionToPush == 'RightTurn') {
+                    gpioFn.turnMotor('right');
+                  }
 
                   // Respond
                   speakResponse(watson_response);
@@ -445,62 +442,8 @@ socket.on("connect", () => {
       timer = 0;
 
       // After finished reporting, emit to instruction socket, set the phase to action
+      textStream.emit('data', 'Waiting...');
       socket.emit("instruction", { phase: "action" });
     }
   });
 });
-
-// OLD
-// getEmotion(user_speech_text).then((detectedEmotion) => {
-//   context.emotion = detectedEmotion.emotion;
-//   conversation.message({
-//     workspace_id: config.ConWorkspace,
-//     input: { 'text': user_speech_text },
-//     context: context
-//   }, (err, response) => {
-//     context = response.context;
-//     const intent = response.intents[0].intent;
-//     const entity = response.entities[0] && response.entities[0].entity;
-
-//     // Change to checking intent and entity
-//     const instructionToPush = getInstruction(intent, entity);
-//     if (intent !== 'hello' && instructionToPush !== 'tryagain') intentArray.push(instructionToPush);
-
-//     // Turn motor
-//     if (instructionToPush == 'LeftTurn') {
-//       gpioFn.turnMotor('left');
-//     } else if (instructionToPush == 'RightTurn') {
-//       gpioFn.turnMotor('right');
-//     }
-
-//     watson_response = response.output.text[0];
-// if (intentArray.length < 3) {
-//   speakResponse(watson_response);
-//   // console.log('Watson says: ', watson_response);
-//   console.log('Intent length: ', intentArray);
-//   // speakResponse('What\'s next, captain?');
-// } else if (intentArray.length === 3) {
-
-//   Instruction.findOne({ shipId: shipUid }, (err, instruction) => {
-//     if (err) throw err;
-//     instruction.instruction0 = intentArray[0];
-//     instruction.instruction1 = intentArray[1];
-//     instruction.instruction2 = intentArray[2];
-//     // instruction.phase = 'action';
-
-//     // Save to database
-//     instruction.save(err, _ => {
-//       if (!err) {
-//         // Emit to socket
-//         console.log("Emit to socket instruction_server!");
-//         socket.emit('instruction_server', {shipId: shipUid});
-//         textStream.emit('close');
-//       }
-//     });
-
-//     console.log('Calling instruction!', intentArray);
-//     intentArray = [];
-//   });
-// }
-//   });
-// });
