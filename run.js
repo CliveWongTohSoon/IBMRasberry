@@ -107,14 +107,6 @@ micInputStream.on("pauseComplete", () => {
   }, Math.round(pauseDuration * 1000)); //Stop listening when speaker is talking
 });
 
-micInputStream.on("stopComplete", () => {
-  console.log("Stopped the mic for ", pauseDuration, " seconds.");
-  setTimeout(() => {
-    micInstance.start();
-    micInputStream.pipe(textStream);
-  }, Math.round(pauseDuration * 1000));
-});
-
 micInputStream.on("resumeComplete", () => {
   console.log("Microphone resumed.");
   // textStream.resume();
@@ -202,7 +194,7 @@ const speakResponse = text => {
         textStream.unpipe();
 
         // // Pause the textStream so it won't overwrites the current speech
-        // textStream.pause();
+        textStream.pause();
 
         exec("paplay output.wav", (error, stdout, stderr) => {
           if (error !== null) {
@@ -332,8 +324,10 @@ socket.on("connect", () => {
     );
 
     // Update speaker
-    gpioFn.updateSpeakers(opponentDistance, opponentAngle);
-
+    for (let i = 0; i < 5; i++) {
+      gpioFn.updateSpeakers(opponentDistance, opponentAngle);
+      gpioFn.pause(300);
+    }
   });
 
   // Introduction
