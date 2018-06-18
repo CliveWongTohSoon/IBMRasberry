@@ -1,7 +1,4 @@
 # IBMRaspberry
-
-## tutorial:
-
 # Getting Started
 ## Overview
 ## Tutorial
