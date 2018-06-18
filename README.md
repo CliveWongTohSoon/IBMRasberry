@@ -164,7 +164,6 @@ Then, enable and start the service:
 ```
 $ sudo systemctl enable my_script.service
 $ sudo systemctl start my_script.service
-$ sudo systemctl start my_script.service
 ```
 
 After rebooting, you should receive an email containing the IP Address of your Raspberry Pi. Use SSH to connect to the IP Address to have remote access of your Raspberry Pi. 
