@@ -128,7 +128,7 @@ $ sudo nano my_script.sh
 and add in the following:
 ```
 #!/bin/bash
-python python /home/pi/Code/startup_mailer.py
+python /home/pi/code/startup_mailer.py
 ```
 Afterwards, make the script executable:
 ```
