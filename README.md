@@ -90,8 +90,78 @@ $ sudo ldconfig
 
 After you reboot, and repeat Step 2 to 5 (which can be written into a script), you will notice the sounds become drastically better. 
 
+## Connect to Raspberry Pi via SSH 
+It might be troublesome to have USB keyboard and mouse connected to your Raspberry Pi everytime you want to have access to it. Therefore, it is more convenient to connect to your Raspberry Pi via SSH from your PC/Mac. Follow the tutorial [here](https://www.raspberrypi.org/documentation/remote-access/ssh/) to set up the Raspberry Pi such that it can be connected via SSH. After it has been set up, you can connect to Raspberry Pi with its IP Address via the command:
+```
+ssh pi@XXX.XXX.X.X
+```
+
 ## Obtain IP Address of the Raspberry Pi via email
-https://gist.github.com/johnantoni/8199088
+There are many ways of obtaining IP Address of Raspberry Pi on boot-up, which allows it to be connected by SSH. The most favoured way of achieving it is by sending an email containing the IP Address of the Raspberry Pi whenever it boots up. You may clone the python script from [here](https://gist.github.com/johnantoni/8199088) which allows email to be sent via gmail. You will need to have gmail account set up to run this script. To make the Python Script executes everytime it boots up and connects to the Internet, do the following:
+
+1. Create code directory
+```
+$ mkdir ~/code
+```
+
+2. Make it executable:
+```
+cd ~/code
+$ sudo chmod +x startup_mailer.py
+```
+You may check the python script actually works by running the python script:
+```
+$ python startup_mailer.py
+```
+If it works, proceed with the next step.
+
+3. Create my_script.sh:
+```
+$ sudo nano my_script.sh
+```
+and add in the following:
+```
+#!/bin/bash
+python python /home/pi/Code/startup_mailer.py
+```
+Afterwards, make the script executable:
+```
+$ chmod u+x my_script.sh
+```
+
+4. Create a new service for my_script.sh:
+```
+$ sudo systemctl edit --force --full my_script.service
+```
+Insert the following:
+```
+[Unit]
+Description=My Script Service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi
+ExecStart=/home/pi/my_script.sh
+
+[Install]
+WantedBy=multi-user.target
+```
+
+5. Check the new service:
+```
+$ systemctl status my_script.service
+```
+Then, enable and start the service:
+```
+$ sudo systemctl enable my_script.service
+$ sudo systemctl start my_script.service
+$ sudo systemctl start my_script.service
+```
+
+After rebooting, you should receive an email containing the IP Address of your Raspberry Pi. Use SSH to connect to the IP Address to have remote access of your Raspberry Pi. 
 
 # Issues
 # Walkarounds
