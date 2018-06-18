@@ -1,4 +1,9 @@
 # Getting Started
+i. [Overview](##Overview)
+ii. [Connect Raspberry Pi to Bluetooth Headsets](## Connect Raspberry Pi to Bluetooth Headsets)
+iii. [Connect to Raspberry Pi via SSH](## Connect to Raspberry Pi via SSH)
+iv. [Obtain IP Address of the Raspberry Pi via email](## Obtain IP Address of the Raspberry Pi via email)
+
 ## Overview
 This is a project done by penultimate year students from Imperial College London in collaboration with IBM to build a turn-based spaceship game that runs by voice commands. The followings are used to develop the game:
 
@@ -18,7 +23,7 @@ The following tutorials are especially helpful to learn how to invoke IBM Watson
 
 After following Part 2 of the tutorial mentioned above, additional configurations need be made so that the Raspberry Pi supports bluetooth input and output via PulseAudio 11.0.
 
-## Connect Raspberry Pi to Bluetooth Earpods
+## Connect Raspberry Pi to Bluetooth Headsets
 The Raspbian Stretch OS running on the Raspberry Pi (at the time of working on this project) does not natively support HSP, which means it can only output sound, but unable to input sound via the mic of the bluetooth earpods. Using USB connected mic as sound input is not ideal for this project because the spaceship has moving parts. The wire attached to the spaceship will hinder its movement. This [tutorial](http://youness.net/raspberry-pi/how-to-connect-bluetooth-headset-or-speaker-to-raspberry-pi-3) provides helpful insights of workaround (sort-of). To summarise the tutorial:
 
 **Step 1:** Start Bluetoothctl tool and initiate it, in terminal:
