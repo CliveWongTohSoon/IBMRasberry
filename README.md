@@ -1,6 +1,6 @@
 # Getting Started
-i. [Overview](##Overview)
-ii. [Connect Raspberry Pi to Bluetooth Headsets](##Connect Raspberry Pi to Bluetooth Headsets)
+i. [Overview](## Overview)
+ii. [Bluetooth](##Connect Raspberry Pi to Bluetooth Headsets)
 iii. [Connect to Raspberry Pi via SSH](##Connect to Raspberry Pi via SSH)
 iv. [Obtain IP Address of the Raspberry Pi via email](##Obtain IP Address of the Raspberry Pi via email)
 
