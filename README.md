@@ -77,8 +77,7 @@ In the file, add in the following:
 load-module module-bluetooth-discover autodetect_mtu=yes
 .endif
 ```
-
-**Step 7:** The PulseAudio 11.1 is not yet available for Raspbian Stretch, but it can be compiled from source:
+The PulseAudio 11.1 is not yet available for Raspbian Stretch, but it can be compiled from source:
 ```
 $ git clone git://anongit.freedesktop.org/pulseaudio/pulseaudio
 $ cd pulseaudio
@@ -89,7 +88,7 @@ $ sudo make install
 $ sudo ldconfig
 ```
 
-Now if you reboot, and repeat Step 2 to 5, or you can write them into a script, you will notice the sounds become drastically better. 
+After you reboot, and repeat Step 2 to 5 (which can be written into a script), you will notice the sounds become drastically better. 
 
 ## Obtain IP Address of the Raspberry Pi via email
 https://gist.github.com/johnantoni/8199088
