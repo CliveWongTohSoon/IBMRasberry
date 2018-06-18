@@ -25,9 +25,9 @@ The following tutorials are especially helpful to learn how to invoke IBM Watson
 After following Part 2 of the tutorial mentioned above, additional configurations need be made so that the Raspberry Pi supports bluetooth input and output via PulseAudio 11.0.
 
 ## Connect Raspberry Pi to Bluetooth Headsets
-The Raspbian Stretch OS running on the Raspberry Pi (at the time of working on this project) does not natively support HSP, which means it can only output sound, but unable to input sound via the mic of the bluetooth earpods. Using USB connected mic as sound input is not ideal for this project because the spaceship has moving parts. The wire attached to the spaceship will hinder its movement. This [tutorial](http://youness.net/raspberry-pi/how-to-connect-bluetooth-headset-or-speaker-to-raspberry-pi-3) provides helpful insights of workaround (sort-of). To summarise the tutorial:
+The Raspbian Stretch OS running on the Raspberry Pi (at the time of working on this project) does not natively support HSP, which means it can only output sound, but unable to input sound via the mic of the bluetooth earpods. Using USB connected mic as sound input is not ideal for this project because the spaceship has moving parts; the wire attached to the spaceship will hinder its movement. This [tutorial](http://youness.net/raspberry-pi/how-to-connect-bluetooth-headset-or-speaker-to-raspberry-pi-3) provides helpful insights of workaround (sort-of). To summarise the tutorial:
 
-**Step 1:** Start Bluetoothctl tool and initiate it, in terminal:
+**Step 1:** Start bluetoothctl tool and initiate it, in terminal:
 ```
 $ bluetoothctl
 power on
@@ -36,14 +36,14 @@ default-agent
 scan on
 ```
 
-**Step 2:** After some time, you will see your bluetooth headset name and MAC address (xx:xx:xx:xx:xx:xx). Note down your bluetooth headset MAC address. Afterwards, key in "exit" to exit bluetoothctl, and kill Bluealsa, then start PulseAudio:
+**Step 2:** After some time, you will see your bluetooth headset name and MAC address (xx:xx:xx:xx:xx:xx). Note down your bluetooth headset MAC address. Afterwards, exit bluetoothctl, kill Bluealsa, then start PulseAudio:
 ```
 exit
 $ sudo killall bluealsa
 $ pulseaudio --start
 ```
 
-**Step 3:** Go back to Bluetoothctl, Pair, trust and connect your device:
+**Step 3:** Go back to bluetoothctl, pair, trust and connect your device:
 ```
 $ bluetoothctl
 pair xx:xx:xx:xx:xx:xx
@@ -55,7 +55,7 @@ connect xx:xx:xx:xx:xx:xx
 $ sudo hcitool cmd 0x3F 0x01C 0x01 0x02 0x00 0x01 0x01
 ```
 
-**Step 5:** Switch your bluetooth earpods to HSP Profile. Note that you can hit "Tab" to auto fill in the xx_xx (your MAC address). Otherwise, you can use pacmd list-cards to check the name of your connected bluetooth device.
+**Step 5:** Switch your bluetooth earpods to HSP Profile. Note that you can hit "Tab" to auto complete your bluez_card.xx_xx_xx_xx_xx_xx (your MAC address). Otherwise, you can use "pacmd list-cards" to check the name of your connected bluetooth device.
 ```
 $ pacmd set-card-profile bluez_card.xx_xx_xx_xx_xx_xx headset_head_unit
 $ pacmd set-default-sink bluez_sink.xx_xx_xx_xx_xx_xx.headset_head_unit
@@ -94,7 +94,7 @@ $ sudo make install
 $ sudo ldconfig
 ```
 
-After you reboot, and repeat Step 2 to 5 (which can be written into a script), you will notice the sounds become drastically better. 
+After you reboot, and repeat Step 2 to 5 (which can be written into a script), you will notice the sounds has drastically improved. 
 
 ## Connect to Raspberry Pi via SSH 
 It might be troublesome to have USB keyboard and mouse connected to your Raspberry Pi everytime you want to have access to it. Therefore, it is more convenient to connect to your Raspberry Pi via SSH from your PC/Mac. Follow the tutorial [here](https://www.raspberrypi.org/documentation/remote-access/ssh/) to set up the Raspberry Pi such that it can be connected via SSH. After it has been set up, you can connect to Raspberry Pi with its IP Address via the command:
