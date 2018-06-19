@@ -4,6 +4,8 @@
   * [Connect Raspberry Pi to Bluetooth Headsets](#connect-raspberry-pi-to-bluetooth-headsets)
   * [Connect to Raspberry Pi via SSH](#connect-to-raspberry-pi-via-ssh)
   * [Obtain IP Address of the Raspberry Pi via email](#obtain-ip-address-of-the-raspberry-pi-via-email)
+* [Issues](#issues)
+* [Walkarounds](#walkarounds)
 
 ## Overview
 This is a project done by penultimate year students from Imperial College London in collaboration with IBM to build a turn-based spaceship game that runs by voice commands. The followings are used to develop the game:
