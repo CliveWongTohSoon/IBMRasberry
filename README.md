@@ -4,8 +4,9 @@
   * [Connect Raspberry Pi to Bluetooth Headsets](#connect-raspberry-pi-to-bluetooth-headsets)
   * [Connect to Raspberry Pi via SSH](#connect-to-raspberry-pi-via-ssh)
   * [Obtain IP Address of the Raspberry Pi via email](#obtain-ip-address-of-the-raspberry-pi-via-email)
+  * [How to use the code](#how-to-use-the-code)
 * [Issues](#issues)
-* [Walkarounds](#walkarounds)
+* [Suggestions](#suggestions)
 
 ## Overview
 This is a project done by penultimate year students from Imperial College London in collaboration with IBM to build a turn-based spaceship game that runs by voice commands. The followings are used to develop the game:
@@ -107,12 +108,12 @@ ssh pi@XXX.XXX.X.X
 ## Obtain IP Address of the Raspberry Pi via email
 There are many ways of obtaining IP Address of Raspberry Pi on boot-up, which allows it to be connected by SSH. The most favoured way of achieving it is by sending an email containing the IP Address of the Raspberry Pi whenever it boots up. You may clone the python script from [here](https://gist.github.com/johnantoni/8199088) which allows email to be sent via gmail. You will need to have gmail account set up to run this script. To make the Python Script executes everytime it boots up and connects to the Internet, do the following:
 
-1. Create code directory
+**Step 1:** Create code directory
 ```
 $ mkdir ~/code
 ```
 
-2. Make it executable:
+**Step 2:** Make it executable:
 ```
 cd ~/code
 $ sudo chmod +x startup_mailer.py
@@ -123,7 +124,7 @@ $ python startup_mailer.py
 ```
 If it works, proceed with the next step.
 
-3. Create my_script.sh:
+**Step 3:** Create my_script.sh:
 ```
 $ sudo nano my_script.sh
 ```
@@ -137,7 +138,7 @@ Afterwards, make the script executable:
 $ chmod u+x my_script.sh
 ```
 
-4. Create a new service for my_script.sh:
+**Step 4:** Create a new service for my_script.sh:
 ```
 $ sudo systemctl edit --force --full my_script.service
 ```
@@ -158,7 +159,7 @@ ExecStart=/home/pi/my_script.sh
 WantedBy=multi-user.target
 ```
 
-5. Check the new service:
+**Step 5:** Check the new service:
 ```
 $ systemctl status my_script.service
 ```
@@ -170,5 +171,55 @@ $ sudo systemctl start my_script.service
 
 After rebooting, you should receive an email containing the IP Address of your Raspberry Pi. Use SSH to connect to the IP Address to have remote access of your Raspberry Pi. 
 
+## How to use the code
+After setting up the Raspberry Pi, your can run the code in this repository with the following steps:
+*Reminder: You need to follow the tutorial aforementioned to install Node.js on your Raspberry Pi. Also, make sure you are in the right directory when executing the command.*
+
+**Step 0:** You need to have IBM cloud account. Go to https://www.ibm.com/cloud/ sign up for IBM account, and create IBM Watson Speech Assistant, Speech to Text, Text to Speech services. Also, create a MongoDb account from https://cloud.mongodb.com/. After getting the credentials respectively, include them in **config.template.js**, then change its name to **config.js**. 
+
+**Step 1:** Install the node package required, this will install all packages from package.json: 
+```
+$ npm install
+```
+
+**Step 2:** The mic module used does not work on Raspberry Pi due to the lack to parameter "device" not working. To fix this, go to the directory *node_modules/mic/lib/* and remove parameter device from the audioProcess on line 60:
+
+Change
+```
+else {
+    audioProcess = spawn('arecord', ['-c', channels, '-r', rate, '-f',
+                         format, '-D', device], audioProcessOptions);
+}
+```
+to
+```
+else {
+    audioProcess = spawn('arecord', ['-c', channels, '-r', rate, '-f',
+                         format], audioProcessOptions);
+}                     
+```
+
+**Step 3:** Notice that gpioFn.js does not run without root permission, therefore we need to give permission to gpioFn.js the permission: 
+```
+$ chmod u+x gpioFn.js
+```
+
+**Step 4:** Now everything has been set up properly, you can run the code:
+```
+$ node run.js
+```
+
+Note that to enable socketIO, you need to have a web app with socketIO server hosted on the cloud. To learn how to push your web app to IBM cloud, you may follow the tutorial [here](https://console.bluemix.net/docs/starters/upload_app.html). The video [here](https://www.youtube.com/watch?v=zp4EKdDZTiY&t=182s) also provides insight of how to write a manifest.yml file for web app deployment on IBM Cloud. Otherwise, you may visit this [repository](https://github.com/kuzhankuixiong/IBMSocialGame) to learn how to deploy the MEAN Web App on IBM Cloud.  
+
 # Issues
-# Walkarounds
+This project is not without issues, which is summarised below:
+1. Watson runs relatively accurate in quiet environment, however, its performance will drop drastically in a noisy environment (in terms of response/callback speed and accuracy), i.e there will be noticably inaccurate and slow response for the speech to text conversion. 
+
+2. In the micInputStream is piped into Watson's Speech to Text Service (via variable *speechToText*). When using micInstance.pause(), it stops piping audio stream to the STT service. Nonetheless, the audio stream is still buffered, and when micInstance.resume() is called, the buffered audio stream will continue flow through. This results in the previous sentence still being "listened" by Watson during the pause() period. You may notice sometimes textStream returns your last sentence when it is resumed.To learn more about pipe method, visit [here](https://nodejs.org/api/stream.html) and [here](https://nodejs.org/en/docs/guides/backpressuring-in-streams/).
+
+3. "Waiting" is emitted to textStream every second because the node will be closed after long period of inactivity (i.e no audio stream being recorded). 
+
+# Suggestions
+1. To fix issue 1, you may adjust the sampling frequency by varying micParams. This could potentially filters out high frequencies noise. 
+
+2. Optimise the code by closing the pipe instead of pausing it. Afterwards, restart the pipe after the response speech has been played. Note that textStream will be closed if the pipe is closed. You might need to rewrite how textStream retrieves data. 
