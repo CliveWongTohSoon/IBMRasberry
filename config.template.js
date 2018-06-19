@@ -17,10 +17,16 @@ exports.ConUsername = '';
 exports.ConPassword = '';
 exports.ConWorkspace = '';
 
-//Credentials for Watson Tone Analyzer service
+// Credentials for Watson Tone Analyzer service
 exports.ToneUsername = '';
 exports.TonePassword = '';
 
-//Credentials for Watson Text to Speech service
+// Credentials for Watson Text to Speech service
 exports.TTSUsername = '';
 exports.TTSPassword = '';
+
+// Link to Web app hosted on IBM Cloud
+exports.webAppLink = '';
+
+// Link to MongoDB
+exports.mongodbUrl = '';
