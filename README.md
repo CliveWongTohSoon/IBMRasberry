@@ -11,7 +11,7 @@
 ## Overview
 This is a project done by penultimate year students from Imperial College London in collaboration with IBM to build a turn-based spaceship game that runs by voice commands. The followings are used to develop the game:
 
-1. MEAN Application that runs on IBM cloud, read [here](https://github.com/kuzhankuixiong/IBMSocialGame/blob/master/README.md) to learn more about how to implement the MEAN Application on IBM Cloud.
+1. MEAN Application that runs on IBM cloud, read [here](https://github.com/CliveWongTohSoon/IBMSocialGame.git) to learn more about how to implement the MEAN Application on IBM Cloud.
 
 2. Raspberry Pi 3 B+ that runs on Raspbian Stretch OS. Node.js is used to run IBM Watson Services, such as Speech to Text, Text to Speech, Watson Assistant, and is connected to MongoDB and MEAN Application on IBM Cloud. Node.js is also used to communicate with the General-purpose Input/Output (GPIO) on the Raspberry Pi. 
 
@@ -209,7 +209,7 @@ $ chmod u+x gpioFn.js
 $ node run.js
 ```
 
-Note that to enable socketIO, you need to have a web app with socketIO server hosted on the cloud. To learn how to push your web app to IBM cloud, you may follow the tutorial [here](https://console.bluemix.net/docs/starters/upload_app.html). The video [here](https://www.youtube.com/watch?v=zp4EKdDZTiY&t=182s) also provides insight of how to write a manifest.yml file for web app deployment on IBM Cloud. Otherwise, you may visit this [repository](https://github.com/kuzhankuixiong/IBMSocialGame) to learn how to deploy the MEAN Web App on IBM Cloud.  
+Note that to enable socketIO, you need to have a web app with socketIO server hosted on the cloud. To learn how to push your web app to IBM cloud, you may follow the tutorial [here](https://console.bluemix.net/docs/starters/upload_app.html). The video [here](https://www.youtube.com/watch?v=zp4EKdDZTiY&t=182s) also provides insight of how to write a manifest.yml file for web app deployment on IBM Cloud. Otherwise, you may visit this [repository](https://github.com/CliveWongTohSoon/IBMSocialGame.git) to learn how to deploy the MEAN Web App on IBM Cloud.  
 
 # Issues
 This project is not without issues, which is summarised below:
