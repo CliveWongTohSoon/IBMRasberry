@@ -43,14 +43,13 @@ const shipUid = "TestShipA";
 /******************************************************************************
  * Set up Socket
  ******************************************************************************/
-const socket = socketIO("https://ibmsg2018.eu-gb.mybluemix.net");
+const socket = socketIO(config.webAppLink);
 
 /******************************************************************************
  * Create MongoDB instance
  ******************************************************************************/
 
-const uri =
-  "mongodb://new-user:IBMSG2018@ibmsocialgame-shard-00-00-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-01-zpkv9.mongodb.net:27017,ibmsocialgame-shard-00-02-zpkv9.mongodb.net:27017/test?ssl=true&replicaSet=IBMSocialGame-shard-0&authSource=admin&retryWrites=true";
+const uri = config.mongodbUrl;
 mongoose.connect(uri);
 
 /******************************************************************************
@@ -201,7 +200,6 @@ const speakResponse = text => {
             console.log("exec error: " + error);
           }
         });
-        // player.play('output.wav');
       });
     });
 };
